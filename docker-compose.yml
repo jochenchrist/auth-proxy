@@ -1,0 +1,32 @@
+version: '3'
+services:
+  keycloak:
+    build: ./keycloak
+    ports:
+      - "8080:8080"
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+    networks:
+      - frontend 
+      - backend
+  openidc-auth-proxy:
+    build: ./openidc-auth-proxy
+    ports:
+     - "80:80"
+    networks:
+      - frontend 
+      - backend
+  app1:
+    build: ./spring-resource-server
+    ports:
+      - "8090"
+    environment:
+      - SERVER_SERVLET_CONTEXTPATH=/app1
+      - SECURITY_OAUTH2_RESOURCE_JWK_KEYSETURI=http://keycloak:8080/auth/realms/myapp/protocol/openid-connect/certs
+    networks: 
+      - backend
+
+networks:
+  frontend:  
+  backend:
